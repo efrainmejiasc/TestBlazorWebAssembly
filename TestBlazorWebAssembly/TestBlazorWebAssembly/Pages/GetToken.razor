@@ -1,0 +1,46 @@
+﻿@page "/getToken"
+@using GraphQL.Client.Http;
+@using GraphQL;
+@using ModernHttpClient;
+@using GraphQL.Client.Serializer.Newtonsoft;
+@using System.Threading.Tasks;
+
+
+<label>@query</label>
+<button class="btn btn-primary" @onclick="GetTokenApi">Get token...</button>
+
+    @code {
+
+        private string result = string.Empty;
+        private string query = "query { accessToken { getPasswordAccessToken( getInput: { audience: \"https://smartway\" clientPublic: \"c6a8672b0a25\" clientSecret: \"FF648E89BDDF\" iPv4: \"1.1.1.1\" oS: \"Pipeline server\" version: \"1.0\" passwordAccess: { userName: \"efrainmejiasc@gmail.com\" password: \"Awesom3@pp\" }} ) {expireUtc impersonated issuedUtc refreshToken roles token}}}";
+        private static GraphQLHttpClient graphQLHttpClient;
+
+        public async Task GetTokenApi()
+        {
+            var uri = new Uri("https://api.dev.queryout.com/graphql/");
+            var graphQLOptions = new GraphQLHttpClientOptions
+            {
+                EndPoint = uri,
+                HttpMessageHandler = new NativeMessageHandler()
+
+            };
+            graphQLHttpClient = new GraphQLHttpClient(graphQLOptions, new NewtonsoftJsonSerializer());
+            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Accept.Clear();
+            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("acccept", "application/json; charset=utf-8");
+            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
+            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "POST");
+            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
+            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Server", "Microsoft-IIS/10.0");
+
+
+
+            var request = new GraphQLRequest
+            {
+                Query = query,
+
+            };
+            var response = await graphQLHttpClient.SendQueryAsync<object>(request);
+            var result = response.Data.ToString();
+        }
+
+    }
