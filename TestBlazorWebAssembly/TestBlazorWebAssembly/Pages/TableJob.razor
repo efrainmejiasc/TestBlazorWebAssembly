@@ -1,0 +1,72 @@
+﻿@page "/tableJob";
+@using GraphQL.Client.Http;
+@using GraphQL;
+@using ModernHttpClient;
+@using Newtonsoft.Json;
+@using GraphQL.Client.Serializer.Newtonsoft;
+
+
+
+<textarea rows="8" cols="150">@result</textarea>
+<br />
+<br />
+<button class="btn btn-primary" @onclick="GetListJobs">Get List Jobs..</button>
+
+@code {
+    private string result = string.Empty;
+    private string query = "query { job { searchJobs ( orderInput: { orderBy: \"CreatedUtc\" orderType: ASCENDING }, searchInput: {organisationId: 1 status: [ DRAFT, PUBLISHED] }, paginationInput:{ page: 1 pageSize: 10 } ) { currentPage firstRowOnPage lastRowOnPage pageCount pageSize rowCount results { id jobTitle createdUtc status } } } }";
+    private static GraphQLHttpClient graphQLHttpClient;
+
+    public async void GetListJobs()
+    {
+        var uri = new Uri("https://api.dev.queryout.com/graphql/");
+        var graphQLOptions = new GraphQLHttpClientOptions
+        {
+            EndPoint = uri,
+            HttpMessageHandler = new NativeMessageHandler(),
+
+
+        };
+        graphQLHttpClient = new GraphQLHttpClient(graphQLOptions, new NewtonsoftJsonSerializer());
+        graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiJTbWFydFdheS5TY2hlZHVsZXIiLCJ1c2VyX2lkIjoiYzczOTMzNDAtYzMwZS00NWIyLWIyOGItZDk5YjY0N2Y2ZmZmIiwidW5pcXVlX25hbWUiOiJlZnJhaW5tZWppYXNjQGdtYWlsLmNvbSIsInJvbGUiOiJTbWFydEFwcCxXZWJhcHAsVXNlcixPcmdhbmlzYXRpb24iLCJwZXJtaXNzaW9ucyI6IlNtYXJ0QXV0aCxTbWFydFdheSxTbWFydENvbmZpZyxTbWFydExvZyIsInNlc3Npb25faWQiOiI4ODc3MzdmYy03NzAxLTRkYWItOTdhNC02MTVhODViY2ZkNTYiLCJuYmYiOjE2MjI0MTI2MzMsImV4cCI6MTYyMjU4NTQzMywiaWF0IjoxNjIyNDEyNjMzLCJpc3MiOiJTbWFydEF1dGgtRGV2ZWxvcG1lbnQiLCJhdWQiOiJodHRwczovL3NtYXJ0d2F5In0.s5-bFgSQlikkZQ67i-lO-emEpsMAiMEMzbLuNn3jd34");
+        var request = new GraphQLRequest
+        {
+            Query = query,
+        };
+        var response = await graphQLHttpClient.SendQueryAsync<object>(request);
+
+        result = response.Data.ToString();
+
+        var jobs = JsonConvert.DeserializeObject<Jobs>(result);
+    }
+    public class Jobs
+    {
+        public Job job { get; set; }
+    }
+
+
+    public class Job
+    {
+        public SearchJobs searchJobs { get; set; }
+    }
+
+    public class SearchJobs
+    {
+        public int currentPage { get; set; }
+        public int firstRowOnPage { get; set; }
+        public int lastRowOnPage { get; set; }
+        public int pageCount { get; set; }
+        public int pageSize { get; set; }
+        public int rowCount { get; set; }
+        public List<Result> results { get; set; }
+    }
+
+    public class Result
+    {
+        public int id { get; set; }
+        public string jobTitle { get; set; }
+        public DateTime createdUtc { get; set; }
+        public string status { get; set; }
+    }
+
+}

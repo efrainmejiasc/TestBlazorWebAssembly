@@ -4,43 +4,89 @@
 @using ModernHttpClient;
 @using GraphQL.Client.Serializer.Newtonsoft;
 @using System.Threading.Tasks;
+@using System.Net.Http;
+@using System.Net.Http.Headers;
+@using Newtonsoft.Json;
+@using System.Text;
 
 
-<label>@result</label>
+<textarea rows="8" cols="150">@result</textarea><br /><br />
 <button class="btn btn-primary" @onclick="GetTokenApi">Get token...</button>
 
-    @code {
+@code {
 
-        private string result = string.Empty;
-        private string query = "query { accessToken { getPasswordAccessToken( getInput: { audience: \"https://smartway\" clientPublic: \"c6a8672b0a25\" clientSecret: \"FF648E89BDDF\" iPv4: \"1.1.1.1\" oS: \"Pipeline server\" version: \"1.0\" passwordAccess: { userName: \"efrainmejiasc@gmail.com\" password: \"Awesom3@pp\" }} ) {expireUtc impersonated issuedUtc refreshToken roles token}}}";
-        private static GraphQLHttpClient graphQLHttpClient;
+    private string result = string.Empty;
+    private string query = "query { accessToken { getPasswordAccessToken( getInput: { audience: \"https://smartway\" clientPublic: \"c6a8672b0a25\" clientSecret: \"FF648E89BDDF\" iPv4: \"1.1.1.1\" oS: \"Pipeline server\" version: \"1.0\" passwordAccess: { userName: \"efrainmejiasc@gmail.com\" password: \"Awesom3@pp\" }} ) {expireUtc impersonated issuedUtc refreshToken roles token}}}";
+    private static GraphQLHttpClient graphQLHttpClient;
 
-        public async Task GetTokenApi()
+    public async Task GetTokenApi()
+    {
+        var uri = new Uri("https://api.dev.queryout.com/graphql/");
+        var graphQLOptions = new GraphQLHttpClientOptions
         {
-            var uri = new Uri("https://api.dev.queryout.com/graphql/");
-            var graphQLOptions = new GraphQLHttpClientOptions
-            {
-                EndPoint = uri,
-                HttpMessageHandler = new NativeMessageHandler()
+            EndPoint = uri,
+            HttpMessageHandler = new NativeMessageHandler()
 
-            };
-            graphQLHttpClient = new GraphQLHttpClient(graphQLOptions, new NewtonsoftJsonSerializer());
-            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Accept.Clear();
-            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("acccept", "application/json; charset=utf-8");
-            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*");
-            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Methods", "POST");
-            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-            graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Server", "Microsoft-IIS/10.0");
+        };
+        graphQLHttpClient = new GraphQLHttpClient(graphQLOptions, new NewtonsoftJsonSerializer());
+        var request = new GraphQLRequest
+        {
+            Query = query,
 
+        };
+        var response = await graphQLHttpClient.SendQueryAsync<object>(request);
+        var authJwt = JsonConvert.DeserializeObject<AuthJwt>(response.Data.ToString());
 
-
-            var request = new GraphQLRequest
-            {
-                Query = query,
-
-            };
-            var response = await graphQLHttpClient.SendQueryAsync<object>(request);
-            var result = response.Data.ToString();
-        }
-
+        result = authJwt.accessToken.getPasswordAccessToken.token;
     }
+
+
+    public class AuthJwt
+    {
+        public AccessToken accessToken { get; set; }
+    }
+
+    public class AccessToken
+    {
+        public GetPasswordAccessToken getPasswordAccessToken { get; set; }
+    }
+
+    public class GetPasswordAccessToken
+    {
+        public DateTime expireUtc { get; set; }
+        public bool impersonated { get; set; }
+        public DateTime issuedUtc { get; set; }
+        public string refreshToken { get; set; }
+        public string roles { get; set; }
+        public string token { get; set; }
+    }
+
+
+
+
+    public async Task<string> GetTokenApi2()
+    {
+        var uri = new Uri("https://api.dev.queryout.com/graphql/");
+        using (HttpClient client = new HttpClient())
+        {
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            HttpResponseMessage response = await client.PostAsync(uri, new StringContent(query, Encoding.UTF8, "application/json"));
+            response.Headers.Add("Access-Control-Allow-Origin", "https://localhost:44379");
+            response.Headers.Add("Access-Control-Request-Method", "POST");
+            response.Headers.Add("Access-Control-Allow-Methods", "POST");
+            response.Headers.Add("Access-Control-Allow-Methods", "POST");
+            response.Headers.Add("Access-Control-Allow-Headers", "X-AspNet-Version,X-Powered-By,Date,Server,Accept,Accept-Encoding,Accept-Language,Cache-Control,Connection,Content-Length,Content-Type,Host,Origin,Pragma,Referer,User-Agent");
+            response.Headers.Add("Server", "Microsoft-IIS/10.0");
+
+            if (response.IsSuccessStatusCode)
+            {
+                result = await response.Content.ReadAsStringAsync();
+            }
+
+            return result;
+        }
+    }
+
+
+}
