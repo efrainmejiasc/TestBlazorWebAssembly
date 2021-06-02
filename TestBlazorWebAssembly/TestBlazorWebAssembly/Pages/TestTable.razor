@@ -1,125 +1,139 @@
 ﻿@page "/testtable"
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime;
 
 
-            @if (sampleData == null)
+<style>
+    tr:hover {
+        background-color: #a6adad !important;
+    }
+</style>
+
+@if (sampleData == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table id="tableTest" class="table" style="font-size:13px;">
+        <thead>
+            <tr>
+                <th style="display:none;"> RecordID </th>
+                <th> OrderID </th>
+                <th> Country </th>
+                <th style="display:none;"> ShipCountry </th>
+                <th> ShipCity </th>
+                <th> ShipName </th>
+                <th> ShipAddress </th>
+                <th> CompanyEmail </th>
+                <th> CompanyAgent </th>
+                <th> CompanyName </th>
+                <th style="display:none;"> Currency </th>
+                <th style="display:none;"> Notes</th>
+                <th> Department </th>
+                <th> Website </th>
+                <th style="display:none;"> Latitude </th>
+                <th style="display:none;"> Longitude </th>
+                <th> ShipDate </th>
+                <th> PaymentDate </th>
+                <th style="display:none;"> TimeZone </th>
+                <th> TotalPayment </th>
+                <th style="display:none;"> Gender </th>
+                <th style="display:none;"> Status </th>
+                <th style="display:none;"> Type </th>
+   
+            </tr>
+        </thead>
+        <tbody>
+            @{ var color = string.Empty;
+                var n = 1;}
+            @foreach (var x in sampleData)
             {
-                <p><em>Loading...</em></p>
+                if (n % 2 == 0)
+                    color = "#b6fada";
+                else
+                    color = "#89d8f1";
+                <tr style="background-color:@color;">
+                    <td style="display:none;"> @x.RecordID </td>
+                    <td style="font-size:10px;"> @x.OrderID </td>
+                    <td> @x.Country </td>
+                    <td style="display:none;"> @x.ShipCountry </td>
+                    <td> @x.ShipCity </td>
+                    <td> @x.ShipName </td>
+                    <td> @x.ShipAddress </td>
+                    <td> @x.CompanyEmail </td>
+                    <td> @x.CompanyAgent </td>
+                    <td> @x.CompanyName </td>
+                    <td style="display:none;"> @x.Currency </td>
+                    <td style="display:none;"> @x.Notes</td>
+                    <td> @x.Department </td>
+                    <td> @x.Website </td>
+                    <td style="display:none;"> @x.Latitude </td>
+                    <td style="display:none;"> @x.Longitude </td>
+                    <td> @x.ShipDate </td>
+                    <td> @x.PaymentDate.ToString().Substring(0, 10)</td>
+                    <td style="display:none;"> @x.TimeZone </td>
+                    <td> @x.TotalPayment </td>
+                    <td style="display:none;"> @x.Gender </td>
+                    <td style="display:none;"> @x.Status </td>
+                    <td style="display:none;"> @x.Type </td>
+                
+                </tr>
+                n++;
             }
-            else
-            {
-                <table class="table table-hover">
-                  <thead>
-                      <tr>
-                          <th> RecordID </th>
-                          <th> OrderID </th>
-                          <th> Country </th>
-                          <th> ShipCountry </th>
-                          <th> ShipCity </th>
-                          <th> ShipName </th>
-                          <th> ShipAddress </th>
-                          <th> CompanyEmail </th>
-                          <th> CompanyAgent </th>
-                          <th> CompanyName </th>
-                          <th> Currency </th>
-                          <th> Notes </th>
-                          <th> Department </th>
-                          <th> Website </th>
-                          <th> Latitude </th>
-                          <th> Longitude </th>
-                          <th> ShipDate </th>
-                          <th> PaymentDate </th>
-                          <th> TimeZone </th>
-                          <th> TotalPayment </th>
-                          <th> Gender </th>
-                          <th> Status </th>
-                          <th> Type </th>
-                          <th> Actions </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var x in sampleData)
-                        {
-                            <tr>
-                                <td> @x.RecordID </td>
-                                <td> @x.OrderID </td>
-                                <td> @x.Country </td>
-                                <td> @x.ShipCountry </td>
-                                <td> @x.ShipCity </td>
-                                <td> @x.ShipName </td>
-                                <td> @x.ShipAddress </td>
-                                <td> @x.CompanyEmail </td>
-                                <td> @x.CompanyAgent </td>
-                                <td> @x.CompanyName </td>
-                                <td> @x.Currency </td>
-                                <td> @x.Notes </td>
-                                <td> @x.Department </td>
-                                <td> @x.Website </td>
-                                <td> @x.Latitude </td>
-                                <td> @x.Longitude </td>
-                                <td> @x.ShipDate </td>
-                                <td> @x.PaymentDate </td>
-                                <td> @x.TimeZone </td>
-                                <td> @x.TotalPayment </td>
-                                <td> @x.Gender </td>
-                                <td> @x.Status </td>
-                                <td> @x.Type </td>
-                                <td> @x.Actions </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
+        </tbody>
+    </table>
+}
+<input type="text" value="@exception" />
 
-            <input type="text" value="@exception" />
+@code {
+    private SampleData[] sampleData;
+    public string exception = string.Empty;
 
-            @code {
-                private SampleData[] sampleData;
-                public string exception = string.Empty;
-
-                protected override async Task OnInitializedAsync()
-                {
-                    try
-                    {
-                        sampleData = await Http.GetFromJsonAsync<SampleData[]>("sample-data/data.json");
-                    }
-                    catch (Exception ex)
-                    {
-                        exception = ex.ToString();
-                    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            sampleData = await Http.GetFromJsonAsync<SampleData[]>("sample-data/data.json");
+            await JSRuntime.InvokeAsync<object>("initializeDataTable", "#tableTest");
+        }
+        catch (Exception ex)
+        {
+            exception = ex.ToString();
+        }
 
 
-                }
+    }
 
-                public class SampleData
-                {
-                    public object RecordID { get; set; }
-                    public object OrderID { get; set; }
-                    public object Country { get; set; }
-                    public object ShipCountry { get; set; }
-                    public object ShipCity { get; set; }
-                    public object ShipName { get; set; }
-                    public object ShipAddress { get; set; }
-                    public object CompanyEmail { get; set; }
-                    public object CompanyAgent { get; set; }
-                    public object CompanyName { get; set; }
-                    public object Currency { get; set; }
-                    public object Notes { get; set; }
-                    public object Department { get; set; }
-                    public object Website { get; set; }
-                    public object Latitude { get; set; }
-                    public object Longitude { get; set; }
-                    public object ShipDate { get; set; }
-                    public object PaymentDate { get; set; }
-                    public object TimeZone { get; set; }
-                    public object TotalPayment { get; set; }
-                    public object Gender { get; set; }
-                    public object Status { get; set; }
-                    public object Type { get; set; }
-                    public object Actions { get; set; }
-                }
-            }
+    public class SampleData
+    {
+        public object RecordID { get; set; }
+        public object OrderID { get; set; }
+        public object Country { get; set; }
+        public object ShipCountry { get; set; }
+        public object ShipCity { get; set; }
+        public object ShipName { get; set; }
+        public object ShipAddress { get; set; }
+        public object CompanyEmail { get; set; }
+        public object CompanyAgent { get; set; }
+        public object CompanyName { get; set; }
+        public object Currency { get; set; }
+        public object Notes { get; set; }
+        public object Department { get; set; }
+        public object Website { get; set; }
+        public object Latitude { get; set; }
+        public object Longitude { get; set; }
+        public object ShipDate { get; set; }
+        public object PaymentDate { get; set; }
+        public object TimeZone { get; set; }
+        public object TotalPayment { get; set; }
+        public object Gender { get; set; }
+        public object Status { get; set; }
+        public object Type { get; set; }
+        public object Actions { get; set; }
+    }
+}
 
 
 
- 
+

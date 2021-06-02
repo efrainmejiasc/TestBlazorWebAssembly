@@ -28,7 +28,7 @@
 
         };
         graphQLHttpClient = new GraphQLHttpClient(graphQLOptions, new NewtonsoftJsonSerializer());
-        graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiJTbWFydFdheS5TY2hlZHVsZXIiLCJ1c2VyX2lkIjoiYzczOTMzNDAtYzMwZS00NWIyLWIyOGItZDk5YjY0N2Y2ZmZmIiwidW5pcXVlX25hbWUiOiJlZnJhaW5tZWppYXNjQGdtYWlsLmNvbSIsInJvbGUiOiJTbWFydEFwcCxXZWJhcHAsVXNlcixPcmdhbmlzYXRpb24iLCJwZXJtaXNzaW9ucyI6IlNtYXJ0QXV0aCxTbWFydFdheSxTbWFydENvbmZpZyxTbWFydExvZyIsInNlc3Npb25faWQiOiI4ODc3MzdmYy03NzAxLTRkYWItOTdhNC02MTVhODViY2ZkNTYiLCJuYmYiOjE2MjI0MTI2MzMsImV4cCI6MTYyMjU4NTQzMywiaWF0IjoxNjIyNDEyNjMzLCJpc3MiOiJTbWFydEF1dGgtRGV2ZWxvcG1lbnQiLCJhdWQiOiJodHRwczovL3NtYXJ0d2F5In0.s5-bFgSQlikkZQ67i-lO-emEpsMAiMEMzbLuNn3jd34");
+        graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiJTbWFydFdheS5TY2hlZHVsZXIiLCJ1c2VyX2lkIjoiYzczOTMzNDAtYzMwZS00NWIyLWIyOGItZDk5YjY0N2Y2ZmZmIiwidW5pcXVlX25hbWUiOiJlZnJhaW5tZWppYXNjQGdtYWlsLmNvbSIsInJvbGUiOiJTbWFydEFwcCxXZWJhcHAsVXNlcixPcmdhbmlzYXRpb24iLCJwZXJtaXNzaW9ucyI6IlNtYXJ0QXV0aCxTbWFydFdheSxTbWFydENvbmZpZyxTbWFydExvZyIsInNlc3Npb25faWQiOiJmZTIyYzBkZS0xNTM4LTQyMjUtOWYwZC03MTJkZTlhZTFiMTciLCJuYmYiOjE2MjI0ODA0MjMsImV4cCI6MTYyMjY1MzIyMywiaWF0IjoxNjIyNDgwNDIzLCJpc3MiOiJTbWFydEF1dGgtRGV2ZWxvcG1lbnQiLCJhdWQiOiJodHRwczovL3NtYXJ0d2F5In0.DmzQnpAEHW6Dku-y-q4F_V-vFalQ0wCh104HeAlUx9Q");
         var request = new GraphQLRequest
         {
             Query = query,
@@ -39,6 +39,7 @@
 
         var jobs = JsonConvert.DeserializeObject<Jobs>(result);
     }
+
     public class Jobs
     {
         public Job job { get; set; }

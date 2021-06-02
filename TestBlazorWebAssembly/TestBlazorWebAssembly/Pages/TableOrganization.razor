@@ -1,0 +1,41 @@
+﻿@page "/tableOrganization"
+
+@using GraphQL.Client.Http;
+@using GraphQL;
+@using ModernHttpClient;
+@using Newtonsoft.Json;
+@using GraphQL.Client.Serializer.Newtonsoft;
+
+<textarea rows="8" cols="150">@result</textarea>
+<br />
+<br />
+<button class="btn btn-primary" @onclick="GetListOrganization">Get List Organization..</button>
+
+
+
+@code {
+    private string result = string.Empty;
+    private string query = "query { organisation { searchOrganisations( searchInput:  { status: ACTIVE } paginationInput: { page: 1, pageSize: 10 } orderInput: { orderBy: \"createdUtc\", orderType: ASCENDING } ) { firstRowOnPage lastRowOnPage currentPage  pageCount pageSize rowCount results { id identifier name createdUtc status } } } }";
+    private static GraphQLHttpClient graphQLHttpClient;
+
+    public async void GetListOrganization()
+    {
+        var uri = new Uri("https://api.dev.queryout.com/graphql/");
+        var graphQLOptions = new GraphQLHttpClientOptions
+        {
+            EndPoint = uri,
+            HttpMessageHandler = new NativeMessageHandler(),
+
+
+        };
+        graphQLHttpClient = new GraphQLHttpClient(graphQLOptions, new NewtonsoftJsonSerializer());
+        graphQLHttpClient.HttpClient.DefaultRequestHeaders.Add("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiJTbWFydFdheS5TY2hlZHVsZXIiLCJ1c2VyX2lkIjoiYzczOTMzNDAtYzMwZS00NWIyLWIyOGItZDk5YjY0N2Y2ZmZmIiwidW5pcXVlX25hbWUiOiJlZnJhaW5tZWppYXNjQGdtYWlsLmNvbSIsInJvbGUiOiJTbWFydEFwcCxXZWJhcHAsVXNlcixBZG1pbixPcmdhbmlzYXRpb24iLCJwZXJtaXNzaW9ucyI6IlNtYXJ0QXV0aCxTbWFydFdheSxTbWFydENvbmZpZyxTbWFydExvZyIsInNlc3Npb25faWQiOiIyMTg3Y2VhZS1kZjVlLTQxZGUtOWM3NS1hZTA5MGI0ZThiODkiLCJuYmYiOjE2MjI1OTI4NjgsImV4cCI6MTYyMjc2NTY2OCwiaWF0IjoxNjIyNTkyODY4LCJpc3MiOiJTbWFydEF1dGgtRGV2ZWxvcG1lbnQiLCJhdWQiOiJodHRwczovL3NtYXJ0d2F5In0.JS-XfCD2aUe2tu5Dh5yMkqaabaxhCDpHYFYTuaygI3M");
+        var request = new GraphQLRequest
+        {
+            Query = query,
+        };
+        var response = await graphQLHttpClient.SendQueryAsync<object>(request);
+
+        result = response.Data.ToString();
+    }
+}

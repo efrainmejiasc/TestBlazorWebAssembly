@@ -9,6 +9,7 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="TestBlazorWebAssembly.styles.css" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -20,6 +21,59 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+
+
+    <script type="text/javascript">
+
+        function initializeDataTable(table) {
+            if (table != '' && table != null && table != 'undefined') {
+                setTimeout(function () {
+                    $(table).DataTable({
+                        language: {
+                            "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/English.json"
+                        }
+                    });
+                }, 1000);
+                console.log(table);
+            }
+        }
+        function testingAjax(value) {
+
+            if (value != '' && value != null && value != 'undefined') {
+                var settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://api.dev.queryout.com/graphql/",
+                    "method": "POST",
+                    "headers": {
+                        "Accept-Encoding": "gzip, deflate, br",
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Connection": "keep-alive",
+                        "DNT": "1",
+                        "Origin": "https://localhost:46791/"
+                    },
+                    "data": {
+                        "someData": "query { accessToken { getPasswordAccessToken( getInput: { audience: \"https://smartway\" clientPublic: \"c6a8672b0a25\" clientSecret: \"FF648E89BDDF\" iPv4: \"1.1.1.1\" oS: \"Pipeline server\" version: \"1.0\" passwordAccess: { userName: \"efrainmejiasc@gmail.com\" password: \"Awesom3@pp\" }} ) {expireUtc impersonated issuedUtc refreshToken roles token}}}"
+                    }
+                }
+
+                $.ajax(settings).done(function (response) {
+                    console.log(response);
+                })
+            }
+
+            else {
+                console.log(value);
+            }
+        }
+    </script>
 </body>
 
 </html>

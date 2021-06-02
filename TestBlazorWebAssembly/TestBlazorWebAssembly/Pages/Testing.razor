@@ -1,0 +1,11 @@
+﻿@page  "/testing"
+@inject IJSRuntime JSRuntime;
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await JSRuntime.InvokeAsync<object>("testingAjax", "Hola Mundo");
+    }
+
+}
